@@ -190,11 +190,11 @@ const loginLimiter = rateLimit({
 // -------------------------
 // Routes
 // -------------------------
-app.get("/health", (req, res) => {
+app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Server is running" });
 });
 
-app.post("/login", loginLimiter, async (req, res) => {
+app.post("/api/login", loginLimiter, async (req, res) => {
   try {
     const { preferredName, password } = req.body;
     if (!preferredName || !password) {
@@ -243,7 +243,7 @@ app.post("/login", loginLimiter, async (req, res) => {
   }
 });
 
-app.get("/attendance/:preferredName", async (req, res) => {
+app.get("/api/attendance/:preferredName", async (req, res) => {
   try {
     const { preferredName } = req.params;
     const normalized = preferredName.trim().toLowerCase();
@@ -326,7 +326,7 @@ app.get("/attendance/:preferredName", async (req, res) => {
 
 //get percentages for each student
 //get percentages for each student
-app.get("/student/profile/:preferredName", async (req, res) => {
+app.get("/api/student/profile/:preferredName", async (req, res) => {
   try {
     const { preferredName } = req.params;
     // console.log("📊 Fetching profile for:", preferredName);
@@ -442,7 +442,7 @@ app.get("/student/profile/:preferredName", async (req, res) => {
 // -------------------------
 
 // Teacher login - uses MASTER_PORTAL_PW
-app.post("/teacher/login", loginLimiter, async (req, res) => {
+app.post("/api/teacher/login", loginLimiter, async (req, res) => {
   try {
     // console.log("🔐 Teacher login attempt");
     // console.log("Request body:", req.body);
@@ -479,7 +479,7 @@ app.post("/teacher/login", loginLimiter, async (req, res) => {
 });
 
 // Get list of unique classes
-app.get("/teacher/classes", async (req, res) => {
+app.get("/api/teacher/classes", async (req, res) => {
   try {
     // console.log("📚 Fetching classes from Courses table...");
     
@@ -549,7 +549,7 @@ app.get("/teacher/classes", async (req, res) => {
 });
 
 // Get attendance summary for a specific class
-app.get("/teacher/class/:className", async (req, res) => {
+app.get("/api/teacher/class/:className", async (req, res) => {
   try {
     const { className } = req.params;
     
