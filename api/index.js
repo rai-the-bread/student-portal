@@ -738,18 +738,37 @@ app.get("/teacher/class/:className", async (req, res) => {
 // -------------------------
 // Boot: load students first, then listen
 // -------------------------
-(async () => {
-  try {
-    await loadStudentsFromAirtable();
-    setInterval(loadStudentsFromAirtable, 5 * 60 * 1000);
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Student Portal API running on http://localhost:${PORT}`);
-      // console.log(`📊 Connected to Airtable Base: ${AIRTABLE_BASE_ID}`);
-      console.log(`🗂️ Attendance Table: ${AIRTABLE_ATTENDANCE_TABLE}`);
-    });
-  } catch (e) {
-    console.error("Failed initial Airtable load:", e);
-    process.exit(1);
+// Initialize students on cold start
+let studentsLoaded = false;
+
+async function ensureStudentsLoaded() {
+  if (!studentsLoaded) {
+    await loadStudentsFromAirtable();
+    studentsLoaded = true;
   }
-})();
+}
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  (async () => {
+    try {
+      await loadStudentsFromAirtable();
+      setInterval(loadStudentsFromAirtable, 5 * 60 * 1000);
+
+      app.listen(PORT, () => {
+        console.log(`🚀 Student Portal API running on http://localhost:${PORT}`);
+        console.log(`🗂️ Attendance Table: ${AIRTABLE_ATTENDANCE_TABLE}`);
+      });
+    } catch (e) {
+      console.error("Failed initial Airtable load:", e);
+      process.exit(1);
+    }
+  })();
+}
+
+// For Vercel serverless - export the handler
+module.exports = async (req, res) => {
+  await ensureStudentsLoaded();
+  return app(req, res);
+};
