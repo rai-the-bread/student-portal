@@ -27,7 +27,7 @@ require("dotenv").config();
 // -------------------------
 const {
   PORTAL_PW_SECRET,
-  MASTER_PORTAL_PW = "",
+  MASTER_PORTAL_PW,
   AIRTABLE_API_KEY,
   AIRTABLE_BASE_ID,
   AIRTABLE_STUDENTS_VIEW = "", // optional view for Students
