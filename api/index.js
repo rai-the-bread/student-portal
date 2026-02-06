@@ -765,3 +765,9 @@ if (require.main === module) {
     }
   })();
 }
+
+// Export for Vercel serverless
+module.exports = async (req, res) => {
+  await ensureStudentsLoaded();
+  return app(req, res);
+};
