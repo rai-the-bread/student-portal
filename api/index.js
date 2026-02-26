@@ -315,8 +315,8 @@ app.get("/attendance/:preferredName", async (req, res) => {
         if (today >= feb9) {
           // after (or on) Feb 9
           if (
-            typeof courseName === "string" &&
-            courseName === "Jan 2026 - TCF/ITP"
+            typeof course === "string" &&
+            course === "Jan 2026 - TCF/ITP"
           ) {
             courseStartDate = feb9;
           } else {
