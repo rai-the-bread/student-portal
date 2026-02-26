@@ -296,9 +296,9 @@ app.get("/attendance/:preferredName", async (req, res) => {
       // check today's date
       const today = new Date();
       // ITP attendance reset date
-      const feb9 = new Date("2026-02-09");
+      const itpStartDate = new Date("2026-02-09");
       // Module start date
-      const jan12 = new Date("2026-01-12");
+      const tcfStartDate = new Date("2026-01-12");
 
     // Filter records to only include those from Feb 9+ for TCF/ITP
 const records = allRecords
@@ -318,7 +318,7 @@ const records = allRecords
     const isTCFITP = courseRecordId === "recUB656NbvYa1cHQ" || 
                      courseRecordId === "recub656nbvya1chq";
     
-    const cutoffDate = isTCFITP && today >= feb9 ? feb9 : jan12;
+    const cutoffDate = isTCFITP && today >= itpStartDate ? itpStartDate : tcfStartDate;
     return date >= cutoffDate;
   })
   .map((record) => ({
@@ -642,16 +642,40 @@ app.get("/teacher/class/:className", async (req, res) => {
     // Filter records where Current Course (from Student) includes our courseRecordId
     // AND the attendance date is on or after the course start date
     const startDateObj = new Date(startDate);
+
+    // TCF/ITP conditional filtering for teacher portal
+    const today = new Date();
+    const tcfStartDate = new Date("2026-01-12");  // Jan 12 for regular/early
+    const itpStartDate = new Date("2026-02-09");  // Feb 9 for ITP (today+)
+
     const courseRecords = allRecords.filter(record => {
       const courses = record.fields?.["Current Course (from Student)"] || [];
       const recordDate = record.fields?.["Date"];
       
-      // Check if this record's course matches AND the date is >= start date
-      const courseMatches = Array.isArray(courses) && courses.includes(courseRecordId);
-      const dateMatches = recordDate ? new Date(recordDate) >= startDateObj : false;
+      if (!recordDate) return false;
       
-      return courseMatches && dateMatches;
+      const date = new Date(recordDate);
+      
+      // Check if this record's course matches our target course
+      const courseMatches = Array.isArray(courses) && courses.includes(courseRecordId);
+      if (!courseMatches) return false;
+      
+      // TCF/ITP logic: Feb 9+ only if today >= Feb 9, otherwise Jan 12
+      const courseRecordIdFromRecord = Array.isArray(courses) && courses.length > 0 ? courses[0] : null;
+      const isTCFITP = courseRecordIdFromRecord === "recUB656NbvYa1cHQ";
+      
+      let cutoffDate;
+      if (isTCFITP && today >= itpStartDate) {
+        cutoffDate = itpStartDate;  // Feb 9 for TCF/ITP (today+)
+      } else {
+        cutoffDate = tcfStartDate;  // Jan 12 for everything else
+      }
+      
+      return date >= cutoffDate;
     });
+
+
+
 
     // ✅ Now aggregate by student - FIXED VARIABLE NAMES
     const studentMap = {};
