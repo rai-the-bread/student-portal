@@ -377,74 +377,37 @@ function StudentDashboard({ student, records, onLogout, loading }) {
   }, [student]);
 
   // Calculate attendance statistics across all blocks
- const calculateStats = () => {
-  if (!studentProfile || !studentProfile.currentCourse) {
-    return {
-      totalBlocks: 0,
-      onTimeBlocks: 0,
-      tardyBlocks: 0,
-      absentBlocks: 0,
-      attendanceRate: 0,
-    };
-  }
+  const calculateStats = () => {
+    let totalBlocks = 0;
+    let onTimeBlocks = 0;
+    let tardyBlocks = 0;
+    let absentBlocks = 0;
 
-  // Normalize profile course
-  const profileStr = String(studentProfile.currentCourse)
-    .toLowerCase()
-    .trim();
-
-    console.log("profile currentCourse raw:", studentProfile.currentCourse);
-    console.log("profileStr:", profileStr);
-    console.log(
-      "raw record.course values:",
-      records.map(r => r.course)
-    );
-
-
-  const courseRecords = records.filter((record) => {
-    let courseVal = record.course;
-
-    if (Array.isArray(courseVal)) {
-      courseVal = courseVal[0] || "";
-    }
-
-    const recordStr = String(courseVal).toLowerCase().trim();
-    console.log("recordStr:", recordStr, "vs profileStr:", profileStr);
-
-    return recordStr === profileStr;
-  });
-
-
-  let totalBlocks = 0;
-  let onTimeBlocks = 0;
-  let tardyBlocks = 0;
-  let absentBlocks = 0;
-
-  courseRecords.forEach((record) => {
-    ["blockA", "blockB", "blockC", "blockD"].forEach((block) => {
-      const status = record[block];
-      if (status) {
-        totalBlocks++;
-        if (status === "On Time") {
-          onTimeBlocks++;
-        } else if (status.includes("Tardy")) {
-          tardyBlocks++;
-        } else if (status.includes("Absent")) {
-          absentBlocks++;
+    records.forEach((record) => {
+      ["blockA", "blockB", "blockC", "blockD"].forEach((block) => {
+        const status = record[block];
+        if (status) {
+          totalBlocks++;
+          if (status === "On Time") {
+            onTimeBlocks++;
+          } else if (status.includes("Tardy")) {
+            tardyBlocks++;
+          } else if (status.includes("Absent")) {
+            absentBlocks++;
+          }
         }
-      }
+      });
     });
-  });
 
-  return {
-    totalBlocks,
-    onTimeBlocks,
-    tardyBlocks,
-    absentBlocks,
-    attendanceRate:
-      totalBlocks > 0 ? Math.round((onTimeBlocks / totalBlocks) * 100) : 0,
+    return {
+      totalBlocks,
+      onTimeBlocks,
+      tardyBlocks,
+      absentBlocks,
+      attendanceRate:
+        totalBlocks > 0 ? Math.round((onTimeBlocks / totalBlocks) * 100) : 0,
+    };
   };
-};
 
   const stats = calculateStats();
 
