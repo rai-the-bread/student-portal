@@ -378,12 +378,29 @@ function StudentDashboard({ student, records, onLogout, loading }) {
 
   // Calculate attendance statistics across all blocks
   const calculateStats = () => {
+    if (!studentProfile || !studentProfile.currentCourse) {
+      return {
+        totalBlocks: 0,
+        onTimeBlocks: 0,
+        tardyBlocks: 0,
+        absentBlocks: 0,
+        attendanceRate: 0,
+      };
+    }
+
+    const currentCourseName = studentProfile.currentCourse;
+
+    // Only use records for the current course
+    const courseRecords = records.filter(
+      (record) => record.course === currentCourseName
+    );
+
     let totalBlocks = 0;
     let onTimeBlocks = 0;
     let tardyBlocks = 0;
     let absentBlocks = 0;
 
-    records.forEach((record) => {
+    courseRecords.forEach((record) => {
       ["blockA", "blockB", "blockC", "blockD"].forEach((block) => {
         const status = record[block];
         if (status) {
