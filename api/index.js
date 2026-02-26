@@ -1,4 +1,4 @@
-// server.js
+// index.js
 // Student Portal API (Express + Airtable)
 // Node 18+ recommended (for global fetch)
 
@@ -30,6 +30,8 @@ const {
   MASTER_PORTAL_PW,
   AIRTABLE_API_KEY,
   AIRTABLE_BASE_ID,
+  TCF_START_DATE,
+  ITP_START_DATE,
   AIRTABLE_STUDENTS_VIEW = "", // optional view for Students
   AIRTABLE_ATTENDANCE_TABLE = "Attendance",
   // AIRTABLE_ATTENDANCE_VIEW = "",
@@ -295,10 +297,8 @@ app.get("/attendance/:preferredName", async (req, res) => {
 
       // check today's date
       const today = new Date();
-      // ITP attendance reset date
-      const itpStartDate = new Date("2026-02-09");
-      // Module start date
-      const tcfStartDate = new Date("2026-01-12");
+      const itpStartDate = new Date(ITP_START_DATE);
+      const tcfStartDate = new Date(TCF_START_DATE);
 
     // Filter records to only include those from Feb 9+ for TCF/ITP
     const records = allRecords
@@ -641,8 +641,8 @@ app.get("/teacher/class/:className", async (req, res) => {
     // AND the attendance date is on or after the course start date
     // TCF/ITP conditional filtering for teacher portal
     const today = new Date();
-    const tcfStartDate = new Date("2026-01-12");  // Jan 12 for regular/early
-    const itpStartDate = new Date("2026-02-09");  // Feb 9 for ITP (today+)
+    const itpStartDate = new Date(ITP_START_DATE);
+    const tcfStartDate = new Date(TCF_START_DATE);
 
     const courseRecords = allRecords.filter(record => {
       const courses = record.fields?.["Current Course (from Student)"] || [];
