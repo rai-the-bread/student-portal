@@ -308,20 +308,17 @@ const records = allRecords
 
     const date = new Date(recordDate);
     
-    // Get course record ID from linked field
+    // FIX: Extract FIRST course ID from array
     const courseRecordIds = record.fields?.["Current Course (from Student)"] || [];
-    let isTCFITP = false;
+    const courseRecordId = Array.isArray(courseRecordIds) && courseRecordIds.length > 0 
+      ? courseRecordIds[0] 
+      : null;
     
-    if (Array.isArray(courseRecordIds) && courseRecordIds.length > 0) {
-      const courseRecordId = courseRecordIds[0];
-      // Quick check: TCF/ITP course record IDs typically start with specific pattern
-      // OR fetch course name (like in /student/profile) - but for speed, check if it's the known TCF record
-      isTCFITP = courseRecordId === "recUB656NbvYa1cHQ";
-    }
-
-    // Use Feb 9 cutoff for TCF/ITP, Jan 12 for everything else
+    // TCF/ITP detection - TRY BOTH CASES
+    const isTCFITP = courseRecordId === "recUB656NbvYa1cHQ" || 
+                     courseRecordId === "recub656nbvya1chq";
+    
     const cutoffDate = isTCFITP && today >= feb9 ? feb9 : jan12;
-    
     return date >= cutoffDate;
   })
   .map((record) => ({
