@@ -388,6 +388,7 @@ function StudentDashboard({ student, records, onLogout, loading }) {
     };
   }
 
+  // Normalize profile course
   const profileStr = String(studentProfile.currentCourse)
     .toLowerCase()
     .trim();
@@ -395,17 +396,14 @@ function StudentDashboard({ student, records, onLogout, loading }) {
   const courseRecords = records.filter((record) => {
     let courseVal = record.course;
 
-    // If Airtable ever sends an array, normalize to first element
+    // From your log: record.course is Array(1), so unwrap it
     if (Array.isArray(courseVal)) {
       courseVal = courseVal[0] || "";
     }
 
     const recordStr = String(courseVal).toLowerCase().trim();
 
-    // logging for debugging
-    console.log("profileStr:", profileStr);
-    console.log("record course values:", [...new Set(records.map(r => r.course))]);
-    // start with strict match
+    // if they match exactly (ignoring case/whitespace), keep it
     return recordStr === profileStr;
   });
 
@@ -439,7 +437,6 @@ function StudentDashboard({ student, records, onLogout, loading }) {
       totalBlocks > 0 ? Math.round((onTimeBlocks / totalBlocks) * 100) : 0,
   };
 };
-
 
   const stats = calculateStats();
 
