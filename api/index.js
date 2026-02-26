@@ -301,35 +301,35 @@ app.get("/attendance/:preferredName", async (req, res) => {
       const tcfStartDate = new Date("2026-01-12");
 
     // Filter records to only include those from Feb 9+ for TCF/ITP
-const records = allRecords
-  .filter((record) => {
-    const recordDate = record.fields?.Date;
-    if (!recordDate) return false;
+    const records = allRecords
+      .filter((record) => {
+        const recordDate = record.fields?.Date;
+        if (!recordDate) return false;
 
-    const date = new Date(recordDate);
-    
-    // FIX: Extract FIRST course ID from array
-    const courseRecordIds = record.fields?.["Current Course (from Student)"] || [];
-    const courseRecordId = Array.isArray(courseRecordIds) && courseRecordIds.length > 0 
-      ? courseRecordIds[0] 
-      : null;
-    
-    // TCF/ITP detection - TRY BOTH CASES
-    const isTCFITP = courseRecordId === "recUB656NbvYa1cHQ" || 
-                     courseRecordId === "recub656nbvya1chq";
-    
-    const cutoffDate = isTCFITP && today >= itpStartDate ? itpStartDate : tcfStartDate;
-    return date >= cutoffDate;
-  })
-  .map((record) => ({
-    id: record.id,
-    date: record.fields?.Date || null,
-    course: record.fields?.["Current Course (from Student)"] || null,
-    blockA: record.fields?.["Block A"] ?? null,
-    blockB: record.fields?.["Block B"] ?? null,
-    blockC: record.fields?.["Block C"] ?? null,
-    blockD: record.fields?.["Block D"] ?? null,
-  }));
+        const date = new Date(recordDate);
+        
+        // FIX: Extract FIRST course ID from array
+        const courseRecordIds = record.fields?.["Current Course (from Student)"] || [];
+        const courseRecordId = Array.isArray(courseRecordIds) && courseRecordIds.length > 0 
+          ? courseRecordIds[0] 
+          : null;
+        
+        // TCF/ITP detection - TRY BOTH CASES
+        const isTCFITP = courseRecordId === "recUB656NbvYa1cHQ" || 
+                        courseRecordId === "recub656nbvya1chq";
+        
+        const cutoffDate = isTCFITP && today >= itpStartDate ? itpStartDate : tcfStartDate;
+        return date >= cutoffDate;
+      })
+      .map((record) => ({
+        id: record.id,
+        date: record.fields?.Date || null,
+        course: record.fields?.["Current Course (from Student)"] || null,
+        blockA: record.fields?.["Block A"] ?? null,
+        blockB: record.fields?.["Block B"] ?? null,
+        blockC: record.fields?.["Block C"] ?? null,
+        blockD: record.fields?.["Block D"] ?? null,
+      }));
 
 
     res.json({ success: true, records });
@@ -639,10 +639,6 @@ app.get("/teacher/class/:className", async (req, res) => {
 
     // Filter records where Current Course (from Student) includes our courseRecordId
     // AND the attendance date is on or after the course start date
-    // Filter records where Current Course (from Student) includes our courseRecordId
-    // AND the attendance date is on or after the course start date
-    const startDateObj = new Date(startDate);
-
     // TCF/ITP conditional filtering for teacher portal
     const today = new Date();
     const tcfStartDate = new Date("2026-01-12");  // Jan 12 for regular/early
