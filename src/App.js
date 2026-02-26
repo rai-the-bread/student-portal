@@ -388,12 +388,16 @@ function StudentDashboard({ student, records, onLogout, loading }) {
       };
     }
 
-    const currentCourseName = studentProfile.currentCourse;
+    const courseFromProfile = studentProfile.currentCourse.toLowerCase();
 
-    // Only use records for the current course
-    const courseRecords = records.filter(
-      (record) => record.course === currentCourseName
-    );
+    const courseRecords = records.filter((record) => {
+      const courseFromRecord = (record.course || "").toLowerCase();
+      // loose match: either contains the other
+      return (
+        courseFromRecord.includes(courseFromProfile) ||
+        courseFromProfile.includes(courseFromRecord)
+      );
+    });
 
     let totalBlocks = 0;
     let onTimeBlocks = 0;
