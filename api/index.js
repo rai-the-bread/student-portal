@@ -257,9 +257,6 @@ app.get("/attendance/:preferredName", async (req, res) => {
     const TABLE_NAME = AIRTABLE_ATTENDANCE_TABLE;
 
     const safeName = student.preferredName.replace(/'/g, "\\'");
-    
-    // Use 2026-01-12 as the course start date (filter out data before course started)
-    const courseStartDate = new Date('2026-01-12');
 
     let allRecords = [];
     let offset = null;
@@ -296,12 +293,40 @@ app.get("/attendance/:preferredName", async (req, res) => {
       offset = data.offset;
     } while (offset);
 
+      // check today's date
+      const today = new Date();
+      // ITP attendance reset date
+      const feb9 = new Date("2026-02-09");
+      // Module start date
+      const jan12 = new Date("2026-01-12");
+
     // Filter records to only include those on or after 2026-01-12
     const records = allRecords
       .filter((record) => {
         const recordDate = record.fields?.Date;
         if (!recordDate) return false;
+
         const date = new Date(recordDate);
+        const course = record.fields?.["Current Course (from Student)"] || "";
+
+        // decide course start date based on course
+        let courseStartDate;
+
+        if (today >= feb9) {
+          // after (or on) Feb 9
+          if (
+            typeof courseName === "string" &&
+            courseName === "Jan 2026 - TCF/ITP"
+          ) {
+            courseStartDate = feb9;
+          } else {
+            courseStartDate = jan12;
+          }
+        } else {
+          // before Feb 9, always use Jan 12
+          courseStartDate = jan12;
+        }
+
         return date >= courseStartDate;
       })
       .map((record) => ({
@@ -324,7 +349,6 @@ app.get("/attendance/:preferredName", async (req, res) => {
   }
 });
 
-//get percentages for each student
 //get percentages for each student
 app.get("/student/profile/:preferredName", async (req, res) => {
   try {
