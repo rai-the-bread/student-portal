@@ -300,44 +300,40 @@ app.get("/attendance/:preferredName", async (req, res) => {
       // Module start date
       const jan12 = new Date("2026-01-12");
 
-    // Filter records to only include those on or after 2026-01-12
-    const records = allRecords
-      .filter((record) => {
-        const recordDate = record.fields?.Date;
-        if (!recordDate) return false;
+    // Filter records to only include those from Feb 9+ for TCF/ITP
+const records = allRecords
+  .filter((record) => {
+    const recordDate = record.fields?.Date;
+    if (!recordDate) return false;
 
-        const date = new Date(recordDate);
-        const course = record.fields?.["Current Course (from Student)"] || "";
+    const date = new Date(recordDate);
+    
+    // Get course record ID from linked field
+    const courseRecordIds = record.fields?.["Current Course (from Student)"] || [];
+    let isTCFITP = false;
+    
+    if (Array.isArray(courseRecordIds) && courseRecordIds.length > 0) {
+      const courseRecordId = courseRecordIds[0];
+      // Quick check: TCF/ITP course record IDs typically start with specific pattern
+      // OR fetch course name (like in /student/profile) - but for speed, check if it's the known TCF record
+      isTCFITP = courseRecordId === "recUB656NbvYa1cHQ";
+    }
 
-        // decide course start date based on course
-        let courseStartDate;
+    // Use Feb 9 cutoff for TCF/ITP, Jan 12 for everything else
+    const cutoffDate = isTCFITP && today >= feb9 ? feb9 : jan12;
+    
+    return date >= cutoffDate;
+  })
+  .map((record) => ({
+    id: record.id,
+    date: record.fields?.Date || null,
+    course: record.fields?.["Current Course (from Student)"] || null,
+    blockA: record.fields?.["Block A"] ?? null,
+    blockB: record.fields?.["Block B"] ?? null,
+    blockC: record.fields?.["Block C"] ?? null,
+    blockD: record.fields?.["Block D"] ?? null,
+  }));
 
-        if (today >= feb9) {
-          // after (or on) Feb 9
-          if (
-            typeof course === "string" &&
-            course === "Jan 2026 - TCF/ITP"
-          ) {
-            courseStartDate = feb9;
-          } else {
-            courseStartDate = jan12;
-          }
-        } else {
-          // before Feb 9, always use Jan 12
-          courseStartDate = jan12;
-        }
-
-        return date >= courseStartDate;
-      })
-      .map((record) => ({
-        id: record.id,
-        date: record.fields?.Date || null,
-        course: record.fields?.["Current Course (from Student)"] || null,
-        blockA: record.fields?.["Block A"] ?? null,
-        blockB: record.fields?.["Block B"] ?? null,
-        blockC: record.fields?.["Block C"] ?? null,
-        blockD: record.fields?.["Block D"] ?? null,
-      }));
 
     res.json({ success: true, records });
   } catch (error) {
