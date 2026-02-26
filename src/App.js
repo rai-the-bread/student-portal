@@ -393,19 +393,27 @@ function StudentDashboard({ student, records, onLogout, loading }) {
     .toLowerCase()
     .trim();
 
+    console.log("profile currentCourse raw:", studentProfile.currentCourse);
+    console.log("profileStr:", profileStr);
+    console.log(
+      "raw record.course values:",
+      records.map(r => r.course)
+    );
+
+
   const courseRecords = records.filter((record) => {
     let courseVal = record.course;
 
-    // From your log: record.course is Array(1), so unwrap it
     if (Array.isArray(courseVal)) {
       courseVal = courseVal[0] || "";
     }
 
     const recordStr = String(courseVal).toLowerCase().trim();
+    console.log("recordStr:", recordStr, "vs profileStr:", profileStr);
 
-    // if they match exactly (ignoring case/whitespace), keep it
     return recordStr === profileStr;
   });
+
 
   let totalBlocks = 0;
   let onTimeBlocks = 0;
