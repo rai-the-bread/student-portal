@@ -645,16 +645,49 @@ app.get("/teacher/class/:className", async (req, res) => {
     // Filter records where Current Course (from Student) includes our courseRecordId
     // AND the attendance date is on or after the course start date
     const startDateObj = new Date(startDate);
-    const courseRecords = allRecords.filter(record => {
-      const courses = record.fields?.["Current Course (from Student)"] || [];
-      const recordDate = record.fields?.["Date"];
-      
-      // Check if this record's course matches AND the date is >= start date
-      const courseMatches = Array.isArray(courses) && courses.includes(courseRecordId);
-      const dateMatches = recordDate ? new Date(recordDate) >= startDateObj : false;
-      
-      return courseMatches && dateMatches;
-    });
+    // Filter records to only include those from Feb 9+ for TCF/ITP - DEBUG VERSION
+console.log(`🔍 Filtering ${allRecords.length} records for ${safeName}`);
+
+const records = allRecords
+  .filter((record) => {
+    const recordDate = record.fields?.Date;
+    if (!recordDate) return false;
+
+    const date = new Date(recordDate);
+    const courseRecordIds = record.fields?.["Current Course (from Student)"] || [];
+    
+    let isTCFITP = false;
+    let courseRecordId = null;
+    
+    if (Array.isArray(courseRecordIds) && courseRecordIds.length > 0) {
+      courseRecordId = courseRecordIds[0];
+      isTCFITP = courseRecordId === "recUB656NbvYa1cHQ";
+    }
+
+    const cutoffDate = isTCFITP && today >= feb9 ? feb9 : jan12;
+    const includeRecord = date >= cutoffDate;
+    
+    // DEBUG LOGGING - only first 5 records + TCF matches
+    if (allRecords.indexOf(record) < 5 || isTCFITP) {
+      console.log(`📅 ${recordDate} | Course ID: ${courseRecordId} | isTCF: ${isTCFITP} | Cutoff: ${cutoffDate.toDateString()} | Include: ${includeRecord}`);
+    }
+    
+    return includeRecord;
+  })
+  .map((record) => ({
+    id: record.id,
+    date: record.fields?.Date || null,
+    course: record.fields?.["Current Course (from Student)"] || null,
+    blockA: record.fields?.["Block A"] ?? null,
+    blockB: record.fields?.["Block B"] ?? null,
+    blockC: record.fields?.["Block C"] ?? null,
+    blockD: record.fields?.["Block D"] ?? null,
+  }));
+
+  console.log(`✅ Final records count: ${records.length}`);
+  records.slice(0, 3).forEach(r => {
+    console.log(`  📋 ${r.date} | Blocks: A=${r.blockA}, B=${r.blockB}`);
+  });
 
     // Now aggregate by student
     const studentMap = {};
