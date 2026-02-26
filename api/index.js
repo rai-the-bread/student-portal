@@ -637,37 +637,33 @@ app.get("/teacher/class/:className", async (req, res) => {
       offset = data.offset;
     } while (offset);
 
-    // console.log(`  Total records fetched: ${allRecords.length}`);
-
     // Filter records where Current Course (from Student) includes our courseRecordId
     // AND the attendance date is on or after the course start date
     const startDateObj = new Date(startDate);
-    // Filter records to only include those from Feb 9+ for TCF/ITP - DEBUG VERSION
-console.log(`🔍 Filtering ${allRecords.length} records for ${safeName}`);
 
-const records = allRecords
-  .filter((record) => {
-    const recordDate = record.fields?.Date;
-    if (!recordDate) return false;
+    const records = allRecords
+      .filter((record) => {
+        const recordDate = record.fields?.Date;
+        if (!recordDate) return false;
 
-    const date = new Date(recordDate);
-    const courseRecordIds = record.fields?.["Current Course (from Student)"] || [];
-    
-    let isTCFITP = false;
-    let courseRecordId = null;
-    
-    if (Array.isArray(courseRecordIds) && courseRecordIds.length > 0) {
-      courseRecordId = courseRecordIds[0];
-      isTCFITP = courseRecordId === "recUB656NbvYa1cHQ";
-    }
+        const date = new Date(recordDate);
+        const courseRecordIds = record.fields?.["Current Course (from Student)"] || [];
+        
+        let isTCFITP = false;
+        let courseRecordId = null;
+        
+        if (Array.isArray(courseRecordIds) && courseRecordIds.length > 0) {
+          courseRecordId = courseRecordIds[0];
+          isTCFITP = courseRecordId === "recUB656NbvYa1cHQ";
+        }
 
-    const cutoffDate = isTCFITP && today >= feb9 ? feb9 : jan12;
-    const includeRecord = date >= cutoffDate;
-    
-    // DEBUG LOGGING - only first 5 records + TCF matches
-    if (allRecords.indexOf(record) < 5 || isTCFITP) {
-      console.log(`📅 ${recordDate} | Course ID: ${courseRecordId} | isTCF: ${isTCFITP} | Cutoff: ${cutoffDate.toDateString()} | Include: ${includeRecord}`);
-    }
+        const cutoffDate = isTCFITP && today >= feb9 ? feb9 : jan12;
+        const includeRecord = date >= cutoffDate;
+        
+        // DEBUG LOGGING - only first 5 records + TCF matches
+        if (allRecords.indexOf(record) < 5 || isTCFITP) {
+          console.log(`📅 ${recordDate} | Course ID: ${courseRecordId} | isTCF: ${isTCFITP} | Cutoff: ${cutoffDate.toDateString()} | Include: ${includeRecord}`);
+        }
     
     return includeRecord;
   })
