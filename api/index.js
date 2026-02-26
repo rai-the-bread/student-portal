@@ -26,7 +26,7 @@ require("dotenv").config();
 // Environment
 // -------------------------
 const {
-  PORTAL_PW_SECRET,
+  PORTAL_PW_SECRET, 
   MASTER_PORTAL_PW = "",
   AIRTABLE_API_KEY,
   AIRTABLE_BASE_ID,
