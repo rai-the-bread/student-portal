@@ -396,7 +396,7 @@ function StudentDashboard({ student, records, onLogout, loading }) {
             absentBlocks++;
           }
         }
-      });
+      }); 
     });
 
     return {
