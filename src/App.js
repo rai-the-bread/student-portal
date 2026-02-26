@@ -377,58 +377,69 @@ function StudentDashboard({ student, records, onLogout, loading }) {
   }, [student]);
 
   // Calculate attendance statistics across all blocks
-  const calculateStats = () => {
-    if (!studentProfile || !studentProfile.currentCourse) {
-      return {
-        totalBlocks: 0,
-        onTimeBlocks: 0,
-        tardyBlocks: 0,
-        absentBlocks: 0,
-        attendanceRate: 0,
-      };
+ const calculateStats = () => {
+  if (!studentProfile || !studentProfile.currentCourse) {
+    return {
+      totalBlocks: 0,
+      onTimeBlocks: 0,
+      tardyBlocks: 0,
+      absentBlocks: 0,
+      attendanceRate: 0,
+    };
+  }
+
+  const profileStr = String(studentProfile.currentCourse)
+    .toLowerCase()
+    .trim();
+
+  const courseRecords = records.filter((record) => {
+    let courseVal = record.course;
+
+    // If Airtable ever sends an array, normalize to first element
+    if (Array.isArray(courseVal)) {
+      courseVal = courseVal[0] || "";
     }
 
-    const courseFromProfile = studentProfile.currentCourse.toLowerCase();
+    const recordStr = String(courseVal).toLowerCase().trim();
 
-    const courseRecords = records.filter((record) => {
-      const courseFromRecord = (record.course || "").toLowerCase();
-      // loose match: either contains the other
-      return (
-        courseFromRecord.includes(courseFromProfile) ||
-        courseFromProfile.includes(courseFromRecord)
-      );
-    });
+    // logging for debugging
+    console.log("profileStr:", profileStr);
+    console.log("record course values:", [...new Set(records.map(r => r.course))]);
+    // start with strict match
+    return recordStr === profileStr;
+  });
 
-    let totalBlocks = 0;
-    let onTimeBlocks = 0;
-    let tardyBlocks = 0;
-    let absentBlocks = 0;
+  let totalBlocks = 0;
+  let onTimeBlocks = 0;
+  let tardyBlocks = 0;
+  let absentBlocks = 0;
 
-    courseRecords.forEach((record) => {
-      ["blockA", "blockB", "blockC", "blockD"].forEach((block) => {
-        const status = record[block];
-        if (status) {
-          totalBlocks++;
-          if (status === "On Time") {
-            onTimeBlocks++;
-          } else if (status.includes("Tardy")) {
-            tardyBlocks++;
-          } else if (status.includes("Absent")) {
-            absentBlocks++;
-          }
+  courseRecords.forEach((record) => {
+    ["blockA", "blockB", "blockC", "blockD"].forEach((block) => {
+      const status = record[block];
+      if (status) {
+        totalBlocks++;
+        if (status === "On Time") {
+          onTimeBlocks++;
+        } else if (status.includes("Tardy")) {
+          tardyBlocks++;
+        } else if (status.includes("Absent")) {
+          absentBlocks++;
         }
-      });
+      }
     });
+  });
 
-    return {
-      totalBlocks,
-      onTimeBlocks,
-      tardyBlocks,
-      absentBlocks,
-      attendanceRate:
-        totalBlocks > 0 ? Math.round((onTimeBlocks / totalBlocks) * 100) : 0,
-    };
+  return {
+    totalBlocks,
+    onTimeBlocks,
+    tardyBlocks,
+    absentBlocks,
+    attendanceRate:
+      totalBlocks > 0 ? Math.round((onTimeBlocks / totalBlocks) * 100) : 0,
   };
+};
+
 
   const stats = calculateStats();
 
