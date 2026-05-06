@@ -297,7 +297,7 @@ app.get("/attendance/:preferredName", async (req, res) => {
     } while (offset);
 
       // check today's date
-      const today = new Date();
+      const today = new Date('2026-05-11'); // For testing; replace with new Date() in production
       const itpStartDate = new Date(ITP_START_DATE);
       const tcfStartDate = new Date(TCF_START_DATE);
 
