@@ -32,6 +32,7 @@ const {
   AIRTABLE_BASE_ID,
   TCF_START_DATE,
   ITP_START_DATE,
+  CURRENT_COURSE_YEAR,
   AIRTABLE_STUDENTS_VIEW = "", // optional view for Students
   AIRTABLE_ATTENDANCE_TABLE = "Attendance",
   // AIRTABLE_ATTENDANCE_VIEW = "",
@@ -504,8 +505,8 @@ app.get("/teacher/classes", async (req, res) => {
     const COURSES_TABLE = "Courses";
 
     const params = new URLSearchParams();
-    // Filter to only 2026 courses
-    params.set("filterByFormula", "FIND('2026', {Name})");
+    // Filter to only current courses
+    params.set("filterByFormula", `FIND(${CURRENT_COURSE_YEAR}, {Name})`);
 
     let allCourses = [];
     let offset = null;
