@@ -535,10 +535,14 @@ app.get("/teacher/classes", async (req, res) => {
 
       const data = await response.json();
       
+      console.log("Courses data:", data.records?.length, "records");
+      console.log("CURRENT_COURSE_YEAR:", CURRENT_COURSE_YEAR);
+      
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       (data.records || []).forEach((record) => {
+        console.log("Course record fields:", record.fields);
         const courseName = record.fields?.["Course Name"];
         const startDate = record.fields?.["Start Date"];
         const endDate = record.fields?.["End Date"];
