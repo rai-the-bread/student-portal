@@ -506,7 +506,7 @@ app.get("/teacher/classes", async (req, res) => {
 
     const params = new URLSearchParams();
     // Filter to only current courses
-    params.set("filterByFormula", `FIND(${CURRENT_COURSE_YEAR}, {Name})`);
+    params.set("filterByFormula", `FIND(${CURRENT_COURSE_YEAR}, {Course Name})`);
 
     let allCourses = [];
     let offset = null;
@@ -580,7 +580,7 @@ app.get("/teacher/class/:className", async (req, res) => {
 
     // First, get the course record ID and Start Date from the Courses table
     const courseParams = new URLSearchParams();
-    courseParams.set("filterByFormula", `{Name}='${className.replace(/'/g, "\\'")}'`);
+    courseParams.set("filterByFormula", `{Course Name}='${className.replace(/'/g, "\\'")}'`);
 
     let courseRecordId = null;
     let startDate = null;
