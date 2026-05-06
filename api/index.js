@@ -535,7 +535,7 @@ app.get("/teacher/classes", async (req, res) => {
 
       const data = await response.json();
       
-      const today = new Date('2026-05-13'); // FOR TESTING
+      const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       (data.records || []).forEach((record) => {
@@ -559,6 +559,7 @@ app.get("/teacher/classes", async (req, res) => {
     } while (offset);
     const classes = allCourses.sort();
     res.json({ success: true, classes });
+    // debug logs
     console.log('CLASSES', classes)
   } catch (error) {
     console.error("Classes fetch error:", error.message);
