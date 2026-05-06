@@ -535,7 +535,7 @@ app.get("/teacher/classes", async (req, res) => {
 
       const data = await response.json();
       
-      const today = new Date('2026-05-12'); // FOR TESTING
+      const today = new Date('2026-05-13'); // FOR TESTING
       today.setHours(0, 0, 0, 0);
 
       (data.records || []).forEach((record) => {
@@ -557,7 +557,6 @@ app.get("/teacher/classes", async (req, res) => {
 
       offset = data.offset;
     } while (offset);
-    console.log("🎯 Final courses list:", allCourses);
     const classes = allCourses.sort();
     res.json({ success: true, classes });
     console.log('CLASSES', classes)
