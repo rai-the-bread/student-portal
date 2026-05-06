@@ -560,6 +560,7 @@ app.get("/teacher/classes", async (req, res) => {
     console.log("🎯 Final courses list:", allCourses);
     const classes = allCourses.sort();
     res.json({ success: true, classes });
+    console.log('CLASSES', classes)
   } catch (error) {
     console.error("Classes fetch error:", error.message);
     res.status(500).json({ error: "Server error fetching classes" });
