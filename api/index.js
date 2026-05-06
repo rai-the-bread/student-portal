@@ -506,12 +506,7 @@ app.get("/teacher/classes", async (req, res) => {
 
     const params = new URLSearchParams();
     // Filter to only current courses
-    params.set("filterByFormula", `FIND("${CURRENT_COURSE_YEAR}", {Course Name})`);
-
-    // debug logs
-    console.log("🔍 Filter formula:", `FIND("${CURRENT_COURSE_YEAR}", {Course Name})`);
-    console.log("🔍 CURRENT_COURSE_YEAR value:", CURRENT_COURSE_YEAR);
-
+    params.set("filterByFormula", `FIND("${CURRENT_COURSE_YEAR}", {Name})`);
     let allCourses = [];
     let offset = null;
 
@@ -539,17 +534,11 @@ app.get("/teacher/classes", async (req, res) => {
 
       const data = await response.json();
       
-      // debug logs
-      console.log("📦 Courses data:", data.records?.length, "records returned from Airtable");
-      console.log("CURRENT_COURSE_YEAR:", CURRENT_COURSE_YEAR);
-      
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       (data.records || []).forEach((record) => {
-        // debug logs
-        console.log("📋 Course record:", record.fields);
-        const courseName = record.fields?.["Course Name"];
+        const courseName = record.fields?.["Name"];
         const startDate = record.fields?.["Start Date"];
         const endDate = record.fields?.["End Date"];
         
@@ -567,8 +556,6 @@ app.get("/teacher/classes", async (req, res) => {
 
       offset = data.offset;
     } while (offset);
-    // debug logs
-    console.log("🎯 Final courses list:", allCourses);
     const classes = allCourses.sort();
     res.json({ success: true, classes });
   } catch (error) {
@@ -587,7 +574,7 @@ app.get("/teacher/class/:className", async (req, res) => {
 
     // First, get the course record ID and Start Date from the Courses table
     const courseParams = new URLSearchParams();
-    courseParams.set("filterByFormula", `{Course Name}='${className.replace(/'/g, "\\'")}'`);
+    courseParams.set("filterByFormula", `{Name}='${className.replace(/'/g, "\\'")}'`);
 
     let courseRecordId = null;
     let startDate = null;
