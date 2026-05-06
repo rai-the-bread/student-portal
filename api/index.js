@@ -539,7 +539,7 @@ app.get("/teacher/classes", async (req, res) => {
       today.setHours(0, 0, 0, 0);
 
       (data.records || []).forEach((record) => {
-        const courseName = record.fields?.["Name"];
+        const courseName = record.fields?.["Course Name"];
         const startDate = record.fields?.["Start Date"];
         const endDate = record.fields?.["End Date"];
         
