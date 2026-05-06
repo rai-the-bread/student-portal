@@ -316,8 +316,8 @@ app.get("/attendance/:preferredName", async (req, res) => {
           : null;
         
         // TCF/ITP detection - TRY BOTH CASES
-        const isTCFITP = courseRecordId === "recUB656NbvYa1cHQ" || 
-                        courseRecordId === "recub656nbvya1chq";
+        const isTCFITP = courseRecordId === "recoYKjacjHue8gsg" || 
+                        courseRecordId === "recoykjacjhue8gsg";
         
         const cutoffDate = isTCFITP && today >= itpStartDate ? itpStartDate : tcfStartDate;
         return date >= cutoffDate;
