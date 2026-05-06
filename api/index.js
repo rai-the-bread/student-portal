@@ -300,7 +300,7 @@ app.get("/attendance/:preferredName", async (req, res) => {
       const itpStartDate = new Date(ITP_START_DATE);
       const tcfStartDate = new Date(TCF_START_DATE);
 
-    // Filter records to only include those from ITP on if ITP has started
+    // Filter records to only include those from Feb 9+ for TCF/ITP
     const records = allRecords
       .filter((record) => {
         const recordDate = record.fields?.Date;
@@ -656,15 +656,15 @@ app.get("/teacher/class/:className", async (req, res) => {
       const courseMatches = Array.isArray(courses) && courses.includes(courseRecordId);
       if (!courseMatches) return false;
       
-      // TCF/ITP logic: If ITP has started, have that be the start date
+      // TCF/ITP logic: Feb 9+ only if today >= Feb 9, otherwise Jan 12
       const courseRecordIdFromRecord = Array.isArray(courses) && courses.length > 0 ? courses[0] : null;
       const isTCFITP = courseRecordIdFromRecord === "recUB656NbvYa1cHQ";
       
       let cutoffDate;
       if (isTCFITP && today >= itpStartDate) {
-        cutoffDate = itpStartDate;
+        cutoffDate = itpStartDate;  // Feb 9 for TCF/ITP (today+)
       } else {
-        cutoffDate = tcfStartDate;
+        cutoffDate = tcfStartDate;  // Jan 12 for everything else
       }
       
       return date >= cutoffDate;
