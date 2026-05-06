@@ -557,6 +557,8 @@ app.get("/teacher/classes", async (req, res) => {
       offset = data.offset;
     } while (offset);
     const classes = allCourses.sort();
+    // debug log
+    console.log(classes);
     res.json({ success: true, classes });
   } catch (error) {
     console.error("Classes fetch error:", error.message);
