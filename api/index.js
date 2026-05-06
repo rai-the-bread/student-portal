@@ -316,8 +316,8 @@ app.get("/attendance/:preferredName", async (req, res) => {
           : null;
         
         // TCF/ITP detection - TRY BOTH CASES
-        const isTCFITP = courseRecordId === "recoYKjacjHue8gsg" || 
-                        courseRecordId === "recoykjacjhue8gsg";
+        const isTCFITP = courseRecordId === "recUB656NbvYa1cHQ" || 
+                        courseRecordId === "recub656nbvya1chq";
         
         const cutoffDate = isTCFITP && today >= itpStartDate ? itpStartDate : tcfStartDate;
         return date >= cutoffDate;
@@ -506,7 +506,8 @@ app.get("/teacher/classes", async (req, res) => {
 
     const params = new URLSearchParams();
     // Filter to only current courses
-    params.set("filterByFormula", `FIND("${CURRENT_COURSE_YEAR}", {Name})`);
+    params.set("filterByFormula", `FIND(${CURRENT_COURSE_YEAR}, {Name})`);
+
     let allCourses = [];
     let offset = null;
 
@@ -534,7 +535,7 @@ app.get("/teacher/classes", async (req, res) => {
 
       const data = await response.json();
       
-      const today = new Date('2026-05-11'); // For testing; replace with new Date() in production
+      const today = new Date('2026-05-12'); // FOR TESTING
       today.setHours(0, 0, 0, 0);
 
       (data.records || []).forEach((record) => {
@@ -556,9 +557,8 @@ app.get("/teacher/classes", async (req, res) => {
 
       offset = data.offset;
     } while (offset);
+    console.log("🎯 Final courses list:", allCourses);
     const classes = allCourses.sort();
-    // debug log
-    console.log(classes);
     res.json({ success: true, classes });
   } catch (error) {
     console.error("Classes fetch error:", error.message);
